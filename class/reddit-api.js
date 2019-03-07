@@ -19,9 +19,6 @@ class RedditThreadFetcher {
     async buildContent() {
         let sub = await this.r.getSubreddit(this.settings.subreddit).getTop({time: "day", limit: 1});
         await this.extractDataFromSubmission(sub);
-
-        console.log(this.videoContent.comments);
-        console.log(this.videoContent.comments.length);
     };
 
     async extractDataFromSubmission(submission) {
