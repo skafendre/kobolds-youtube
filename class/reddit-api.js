@@ -24,11 +24,11 @@ class RedditThreadFetcher {
     async extractDataFromSubmission(submission) {
         this.videoContent.title = submission.map(s => s.title)[0];
         this.videoContent.id = submission.map(s => s.id)[0];
-        console.log(this.videoContent);
 
+        // GET COMMENTS DATA
         let comments = await this.r.getSubmission(this.videoContent.id).comments.map(post => ({
             id: post.id,
-            body: removeMd(this.stripLineReturn(post.body)),
+            body: removeMd(post.body.replace(/\n/g, '')),
             author: post.author.name,
             edited: post.edited,
             is_submitter: post.is_submitter,
@@ -39,12 +39,13 @@ class RedditThreadFetcher {
             depth: post.depth,
         }));
 
-        this.videoContent.comments = comments.filter(comment => comment.author !== "[deleted]" && comment.body !== "[removed]") // get the deleted out
-    };
+        // remove useless stuff
+        this.videoContent.comments = comments.filter(comment => comment.author !== "[deleted]" && comment.body !== "[removed]");
+        this.videoContent.maxChar = this.videoContent.comments.reduce((acc, comment) => acc + comment.body.length, 0);
 
-     stripLineReturn (str) {
-        return str.replace(/\n/g, '')
-    }
+        console.log("char length: " + this.videoContent.maxChar);
+        console.log("total comments: " + this.videoContent.comments.length);
+    };
 }
 
 module.exports = RedditThreadFetcher;

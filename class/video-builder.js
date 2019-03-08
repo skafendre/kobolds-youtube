@@ -1,27 +1,29 @@
 "use strict";
-const RedditThreadFetcher = require("./class/reddit-api");
-const CloudTTS = require("./class/cloud-tts");
+const RedditThreadFetcher = require("./reddit-api");
+const CloudTTS = require("./cloud-tts");
 const fs = require("fs");
 
 class VideoBuilder {
     constructor () {
-
+        this.reddit = new RedditThreadFetcher("GoneWild");
+        this.cloudTTS = new CloudTTS();
     }
 
     async buildVideo() {
-        let reddit = new RedditThreadFetcher("GoneWild");
-        let cloudTTS = new CloudTTS();
+        await this.reddit.buildContent();
+        console.log(this.reddit.videoContent);
+        console.log(this.reddit.videoContent.comments.length);
 
-        await reddit.buildContent();
-        console.log(reddit.videoContent);
-        console.log(reddit.videoContent.comments.length);
+        this.id = this.reddit.settings.subreddit.toLowerCase() + "_" + this.reddit.videoContent.id;
+
+        this.createFolder("assets/" + this.id);
 
         // await cloudTTS.testSynthetize();
     }
 
-// async function createFolder (dir) {
-//     !fs.existsSync(dir) && fs.mkdirSync(dir);
-// }
+    async createFolder (dir) {
+        !fs.existsSync(dir) && fs.mkdirSync(dir);
+    }
 }
 
 module.exports = VideoBuilder;
