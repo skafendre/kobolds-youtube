@@ -6,7 +6,7 @@
     },
     "production" : {
         "audio": {
-            "targetLength" : "400"
+            "targetLength" : "430"
         }
     }
 }
