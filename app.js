@@ -1,16 +1,6 @@
-"use strict";
-const RedditThreadFetcher = require("./class/reddit-api");
-const CloudTTS = require("./class/cloud-tts");
+const videoBuilder = require("./class/video-builder");
 
-// Create video function
-async function buildVideo() {
-    let reddit = new RedditThreadFetcher("AskReddit");
-    let cloudTTS = new CloudTTS();
+const vBuilder = new videoBuilder();
+vBuilder.buildVideo();
 
-    await reddit.buildContent();
-    await cloudTTS.testSynthetize();
-
-    console.log(reddit.videoContent.comments.length);
-}
-
-buildVideo();
+console.log("hello app");
