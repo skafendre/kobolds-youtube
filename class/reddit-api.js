@@ -2,6 +2,7 @@
 require('dotenv').config();
 const removeMd = require('remove-markdown');
 const snoowrap = require('snoowrap');
+const logger = require('./../scripts/logger');
 
 class RedditThreadFetcher {
     constructor(subreddit) {
@@ -43,8 +44,13 @@ class RedditThreadFetcher {
         this.videoContent.comments = comments.filter(comment => comment.author !== "[deleted]" && comment.body !== "[removed]");
         this.videoContent.maxChar = this.videoContent.comments.reduce((acc, comment) => acc + comment.body.length, 0);
 
-        console.log("char length: " + this.videoContent.maxChar);
-        console.log("total comments: " + this.videoContent.comments.length);
+        let test = {
+            title: this.videoContent.title,
+            id: this.videoContent.id,
+            maxChar: this.videoContent.maxChar,
+            commentsNb: this.videoContent.comments.length,
+        };
+        logger.info("RedditThreadFetcher returns => " + test);
     };
 }
 

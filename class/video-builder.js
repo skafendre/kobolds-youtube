@@ -2,6 +2,7 @@
 const RedditThreadFetcher = require("./reddit-api");
 const CloudTTS = require("./cloud-tts");
 const fs = require("fs");
+const logger = require("./../scripts/logger");
 
 class VideoBuilder {
     constructor () {
@@ -10,19 +11,21 @@ class VideoBuilder {
     }
 
     async buildVideo() {
+        // reddit
         await this.reddit.buildContent();
-        console.log(this.reddit.videoContent);
-        console.log(this.reddit.videoContent.comments.length);
-
         this.id = this.reddit.settings.subreddit.toLowerCase() + "_" + this.reddit.videoContent.id;
 
-        this.createFolder("assets/" + this.id);
+        this.createFolder(this.id);
 
+        // Cloud Text-to-Speech
         // await cloudTTS.testSynthetize();
     }
 
-    async createFolder (dir) {
-        !fs.existsSync(dir) && fs.mkdirSync(dir);
+    createFolder (dir) {
+        !fs.existsSync("assets/" + dir) && fs.mkdirSync("assets/" + dir);
+        fs.existsSync("assets/" + dir) ?
+            logger.info("Directory '" + dir + "' created in /assets") :
+            logger.error("Directory '" + dir + "' has not been created");
     }
 }
 
