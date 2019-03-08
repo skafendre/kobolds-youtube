@@ -3,9 +3,10 @@ const fs = require('fs');
 const util = require('util');
 const textToSpeech = require('@google-cloud/text-to-speech');
 const logger = require('./../scripts/logger');
+const config = require('./../config/app-config.json');
 
 // LOAD API REQUEST CONFIG FILE
-const ttsConfig = require("./../config/tts_config");
+const ttsRequests = require("../config/tts-requests");
 
 class CloudTTS {
     constructor () {
@@ -17,7 +18,7 @@ class CloudTTS {
         this.dir = "";
     }
 
-    async synthetizeArray (array) {
+    async synthetizeComments (array) {
         array.forEach((comment, key) => {
             console.log(comment + " " + key);
             this.synthetize(comment, key);
@@ -25,6 +26,15 @@ class CloudTTS {
     }
 
     async synthetize (content, key) {
+        
+
+        let fileOutput = "assets/thread/" + this.dir + "/" + "audio_" + key + ".mp3";
+
+        if (fs.existsSync(fileOutput)) {
+            logger.warn(fileOutput + " already exists, canceled synthetize() in cloud-tts.js");
+            return;
+        }
+
         const request = {
             input: {text: content},
             voice: {languageCode: 'en-US', ssmlGender: 'NEUTRAL'},
@@ -33,11 +43,14 @@ class CloudTTS {
 
         // Performs the Text-to-Speech request
         const [response] = await this.client.synthesizeSpeech(request);
-
-        // print
         const writeFile = util.promisify(fs.writeFile);
-        await writeFile("assets/" + this.dir + "/" + "audio_" + key + ".mp3" , response.audioContent, 'binary');
-        console.log('Audio content written to file: ');
+        await writeFile(fileOutput , response.audioContent, 'binary');
+
+        if (fs.existsSync(fileOutput)) {
+            logger.info(fileOutput + " written");
+        } else {
+            logger.error(fileOutput + " has not been written");
+        }
     }
 }
 

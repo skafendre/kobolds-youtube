@@ -18,19 +18,19 @@ class VideoBuilder {
         this.createFolder(this.id);
 
         // Cloud Text-to-Speech
-        await this.cloudTTS.synthetizeArray(this.reddit.videoContent.comments.map(comment => comment.body));
-        // await this.cloudTTS.testSynthetize();
+        await this.cloudTTS.synthetizeComments(this.reddit.videoContent.comments.map(comment => comment.body));
     }
 
     createFolder (dir) {
-        !fs.existsSync("assets/" + dir) && fs.mkdirSync("assets/" + dir);
+        let path = "assets/thread/";
+        !fs.existsSync(path + dir) && fs.mkdirSync(path + dir);
 
-        if (fs.existsSync("assets/" + dir)) {
-            logger.info("Directory '" + dir + "' created in /assets");
+        if (fs.existsSync(path + dir)) {
+            logger.info("Directory '" + dir + "' created in " + path);
             this.cloudTTS.dir = dir;
         } else {
             logger.error("Directory '" + dir + "' has not been created");
-            throw new Error('listId does not exist');
+            throw new Error('fatal error creation folder uncompleted');
         }
     }
 }
