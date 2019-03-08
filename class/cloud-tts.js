@@ -2,6 +2,8 @@
 const fs = require('fs');
 const util = require('util');
 const textToSpeech = require('@google-cloud/text-to-speech');
+const logger = require('./../scripts/logger');
+
 // LOAD API REQUEST CONFIG FILE
 const ttsConfig = require("./../config/tts_config");
 
@@ -11,26 +13,30 @@ class CloudTTS {
             projectId: 'reddit-youtube-video-creator',
             keyFilename: 'gcloud_auth.json'
         });
+        this.comments = {};
+        this.dir = "";
     }
 
-    async testSynthetize () {
-        const text = 'Hello, world!';
+    async synthetizeArray (array) {
+        array.forEach((comment, key) => {
+            console.log(comment + " " + key);
+            this.synthetize(comment, key);
+        });
+    }
 
+    async synthetize (content, key) {
         const request = {
-            input: {text: text},
+            input: {text: content},
             voice: {languageCode: 'en-US', ssmlGender: 'NEUTRAL'},
             audioConfig: {audioEncoding: 'MP3'},
         };
 
         // Performs the Text-to-Speech request
         const [response] = await this.client.synthesizeSpeech(request);
-        this.printAudio(response);
-    }
 
-    async printAudio (audio) {
-        // Write the binary audio content to a local file
+        // print
         const writeFile = util.promisify(fs.writeFile);
-        await writeFile('output.mp3', audio.audioContent, 'binary');
+        await writeFile("assets/" + this.dir + "/" + "audio_" + key + ".mp3" , response.audioContent, 'binary');
         console.log('Audio content written to file: ');
     }
 }

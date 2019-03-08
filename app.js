@@ -3,5 +3,6 @@ const logger = require("./scripts/logger");
 
 const vBuilder = new videoBuilder();
 vBuilder.buildVideo();
+logger.info("app launched");
 
-console.log("hello app");
+
