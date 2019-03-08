@@ -29,7 +29,7 @@ class RedditThreadFetcher {
         // GET COMMENTS DATA
         let comments = await this.r.getSubmission(this.videoContent.id).comments.map(post => ({
             id: post.id,
-            body: removeMd(post.body.replace(/\n/g, '')),
+            body: this.cleanComment(post.body),
             author: post.author.name,
             edited: post.edited,
             is_submitter: post.is_submitter,
@@ -44,6 +44,7 @@ class RedditThreadFetcher {
         this.videoContent.comments = comments.filter(comment => comment.author !== "[deleted]" && comment.body !== "[removed]");
         this.videoContent.maxChar = this.videoContent.comments.reduce((acc, comment) => acc + comment.body.length, 0);
 
+        // trying to log some stuff for winston
         let test = {
             title: this.videoContent.title,
             id: this.videoContent.id,
@@ -52,6 +53,10 @@ class RedditThreadFetcher {
         };
         logger.info("RedditThreadFetcher returns => " + test);
     };
+
+    cleanComment (comment) {
+        return removeMd(comment.replace(/\n/g, '')).replace(/(?:https?|ftp):\/\/[\n\S]+/g, '');
+    }
 }
 
 module.exports = RedditThreadFetcher;

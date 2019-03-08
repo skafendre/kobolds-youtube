@@ -6,7 +6,7 @@ const logger = require("./../scripts/logger");
 
 class VideoBuilder {
     constructor () {
-        this.reddit = new RedditThreadFetcher("Touhou");
+        this.reddit = new RedditThreadFetcher("GoneWild");
         this.cloudTTS = new CloudTTS();
     }
 
@@ -18,7 +18,9 @@ class VideoBuilder {
         this.createFolder(this.id);
 
         // Cloud Text-to-Speech
-        await this.cloudTTS.synthetizeComments(this.reddit.videoContent.comments.map(comment => comment.body));
+        this.cloudTTS.comments = this.reddit.videoContent.comments.map(comment => comment.body);
+
+        await this.cloudTTS.synthetizeComments();
     }
 
     createFolder (dir) {
