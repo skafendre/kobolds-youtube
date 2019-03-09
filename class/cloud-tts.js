@@ -30,8 +30,6 @@ class CloudTTS {
         }
 
         this.comments = this.comments.slice(0, i);
-        console.log(this.comments);
-
         logger.info(this.comments.length + " comments left after TTS audio conversion " + ", " + gConfig.audio.targetLength + " seconds reached.");
     }
 

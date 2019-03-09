@@ -25,6 +25,13 @@ class VideoBuilder {
         // Cloud Text-to-Speech
         this.cloudTTS.comments = this.reddit.videoContent.comments.map(comment => comment.body);
         await this.cloudTTS.synthetizeComments();
+
+        // Visuals creation
+        let selectedComments = this.reddit.videoContent.comments.splice(0, this.cloudTTS.comments.length);
+        logger.info("Size of comment array passed to Visuals Creation: " + selectedComments.length);
+        this.commentVisuals.comments = selectedComments;
+
+        this.commentVisuals.createVisuals();
     }
 
     createFolder (id) {

@@ -30,6 +30,7 @@ class RedditThreadFetcher {
         let comments = await this.r.getSubmission(this.videoContent.id).comments.map(post => ({
             id: post.id,
             body: this.cleanComment(post.body),
+            original_body: post.body,
             author: post.author.name,
             edited: post.edited,
             is_submitter: post.is_submitter,
@@ -39,6 +40,7 @@ class RedditThreadFetcher {
             stickied: post.stickied,
             depth: post.depth,
         }));
+
 
         // remove useless stuff
         this.videoContent.comments = comments.filter(comment => comment.author !== "[deleted]" && comment.body !== "[removed]");
