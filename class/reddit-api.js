@@ -45,13 +45,12 @@ class RedditThreadFetcher {
         this.videoContent.maxChar = this.videoContent.comments.reduce((acc, comment) => acc + comment.body.length, 0);
 
         // trying to log some stuff for winston
-        let test = {
+        logger.log("info", "Reddit thread info: ", {
             title: this.videoContent.title,
             id: this.videoContent.id,
             maxChar: this.videoContent.maxChar,
             commentsNb: this.videoContent.comments.length,
-        };
-        logger.info("RedditThreadFetcher returns => " + test);
+        })
     };
 
     cleanComment (comment) {

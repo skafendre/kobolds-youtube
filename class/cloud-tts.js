@@ -41,8 +41,7 @@ class CloudTTS {
         let fileOutput = "assets/thread/" + this.dir + "/" + this.dir + "_audio_" + key + ".mp3";
 
         if (fs.existsSync(fileOutput)) {
-            this.audioLength += await gad.getAudioDurationInSeconds(fileOutput);
-            logger.info(this.audioLength);
+            await this.incrementAudioLength(fileOutput);
             logger.warn(fileOutput + " already exists, cancelled synthetize() in cloud-tts.js");
             return;
         }
@@ -61,12 +60,16 @@ class CloudTTS {
 
         // Check if the file has been written
         if (fs.existsSync(fileOutput)) {
-            this.audioLength += await gad.getAudioDurationInSeconds(fileOutput);
-            logger.info(this.audioLength);
+            await this.incrementAudioLength(fileOutput);
             logger.info(fileOutput + " written");
         } else {
             logger.error(fileOutput + " has not been written");
         }
+    }
+
+    async incrementAudioLength (fileOutput) {
+        this.audioLength += await gad.getAudioDurationInSeconds(fileOutput);
+        logger.info("Total comment audio length: " + this.audioLength);
     }
 }
 

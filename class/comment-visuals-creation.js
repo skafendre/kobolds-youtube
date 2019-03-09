@@ -32,9 +32,9 @@ class CommentVisualsCreation {
     }
 }
 
-test = new CommentVisualsCreation();
-test.startExpressServer();
-test.appendToHtml();
+// test = new CommentVisualsCreation();
+// test.startExpressServer();
+// test.appendToHtml();
 // test.takeScreenshot();
 
 module.exports = CommentVisualsCreation;
