@@ -5,7 +5,7 @@ const logger = require("./../scripts/logger");
 // CLASSES
 const RedditThreadFetcher = require("./reddit-api");
 const CloudTTS = require("./cloud-tts");
-const CommentVisualCreator = require("./comment-visualisation");
+const CommentVisualCreator = require("./comment-visuals-creation");
 
 
 class VideoBuilder {
@@ -27,16 +27,17 @@ class VideoBuilder {
         await this.cloudTTS.synthetizeComments();
     }
 
-    createFolder (dir) {
+    createFolder (id) {
         let path = "assets/thread/";
-        !fs.existsSync(path + dir) && fs.mkdirSync(path + dir);
+        !fs.existsSync(path + id) && fs.mkdirSync(path + id);
 
-        if (fs.existsSync(path + dir)) {
-            logger.info("Directory '" + dir + "' created in " + path);
-            this.cloudTTS.dir = dir;
-            this.commentVisuals.dir = dir;
+        // check if the folder has been properly created
+        if (fs.existsSync(path + id)) {
+            logger.info("Directory '" + id + "' created in " + path);
+            this.cloudTTS.dir = id;
+            this.commentVisuals.dir = id;
         } else {
-            logger.error("Directory '" + dir + "' has not been created");
+            logger.error("Directory '" + id + "' has not been created");
             throw new Error('fatal error creation folder uncompleted');
         }
     }
