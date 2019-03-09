@@ -34,7 +34,7 @@ class RedditThreadFetcher {
             author: post.author.name,
             edited: post.edited,
             is_submitter: post.is_submitter,
-            upvote: post.ups,
+            score: post.score,
             gilded: post.gilded,
             gildings: post.gildings,
             stickied: post.stickied,

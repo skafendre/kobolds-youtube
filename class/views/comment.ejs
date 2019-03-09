@@ -2,14 +2,32 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>User page</title>
+    <script type="text/css">
+        body {
+            color: blue;
+        }
+    </script>
 </head>
 <body>
-<h1> Profile: <%= name %> </h1>
-<ul>
-    <li> <b>Age:</b> <%= info.age %> years old </li>
-    <li> <b>Occupation:</b> <%= info.occupation %> </li>
-    <li> <b>Hobby is:</b> <%= info.hobby %> </li>
-</ul>
+<div id="container">
+        <div class="main-title">
+            <h1> Comment <%= key %> </h1>
+        </div>
+        <div class="comment-title">
+            <%= info.author %> <%= info.score %> date placeholder
+        </div>
+        <div class="comment-body">
+            <%= info.body %>
+        </div>
+        <div class="Footer">
+            <span>Reply</span>
+            <span>Give award</span>
+            <span>Share</span>
+            <span>Report</span>
+            <span>Save</span>
+        </div>
+    </div>
 </body>
 </html>
+
+
