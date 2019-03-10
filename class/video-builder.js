@@ -10,7 +10,7 @@ const CommentVisualCreator = require("./comment-visuals-creation");
 
 class VideoBuilder {
     constructor () {
-        this.reddit = new RedditThreadFetcher("GoneWild");
+        this.reddit = new RedditThreadFetcher("AskScience");
         this.cloudTTS = new CloudTTS();
         this.commentVisuals = new CommentVisualCreator();
     }
@@ -31,7 +31,7 @@ class VideoBuilder {
         logger.info("Size of comment array passed to Visuals Creation: " + selectedComments.length);
         this.commentVisuals.comments = selectedComments;
 
-        this.commentVisuals.createVisuals();
+        await this.commentVisuals.createVisuals();
     }
 
     createFolder (id) {

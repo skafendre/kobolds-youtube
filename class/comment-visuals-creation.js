@@ -1,87 +1,57 @@
 const webshot = require('webshot');
-const express = require('express');
-const path = require("path");
 const logger = require("./../scripts/logger");
-
-var Users = {
-
-    'David': {
-        age: 52,
-        occupation: 'Professor',
-        hobby: 'Swimming'
-    },
-};
-
+const fs = require("fs");
+const path = require("path");
 
 class CommentVisualsCreation {
     constructor () {
+        this.options = {
+            screenSize: { width: 1920, height: 1080 },
+            shotSize: { width: 1920, height: 1080 },
+            errorIfJSException: "true",
+        };
         this.dir = "";
-        // this.comments = "";
-        this.comments = [
-            { id: 'ei49436',
-            body: 'I thought it always was no panties season.',
-            original_body: 'I thought it always was no panties season. ',
-            author: 'AwhGz',
-            edited: false,
-            is_submitter: false,
-            score: 61,
-            gilded: 0,
-            gildings: { gid_1: 0, gid_2: 0, gid_3: 0 },
-            stickied: false,
-            depth: 0 }
-            ];
-        this.app = express();
+        this.comments = "";
     }
 
-    createVisuals () {
+    async createVisuals () {
         logger.info("Started createVisuals() inside CommentVisualsCreation");
-        // console.log(this.comments);
-        console.log(CommentVisualsCreation.comments[0]);
-    }
 
-    startExpressServer () {
-        // set server
-        this.app.set('view engine', 'ejs');
-        const port = 3000;
+        const arrayToObject = (array) =>
+            array.reduce((obj, item) => {
+                obj[item.id] = item;
+                return obj
+            }, {});
 
-        this.app.use(express.static(path.resolve(__dirname)));
+        let json = JSON.stringify(arrayToObject(this.comments));
 
-        // pass comments to /comments
-        let comments = this.comments;
-        this.app.get('/comments', function (req, res) {
-            console.log(comments[0]);
-            let check = comments[req.query.key];
-            if (check) {
-                res.render('comment', { key: req.query.key, info: check });
+        // PATH TO THE VISUALS CREATOR JSON COMMENTS FILES
+        let jsonPath = path.resolve(__dirname, "..", "..", "simple-visuals-creator", "comments.json");
+        logger.debug("Path to comments.json (visuals creation): " + jsonPath);
+        await fs.writeFile(jsonPath, json, (err) => {
+            if (err) {
+                logger.error(err);
             } else {
-                res.send('Nani ?!');
+                logger.info("JSON successfully written to file");
             }
         });
 
-        // start server
-        this.app.listen(port, () => console.log(`Example app listening on port ${port}!`));
+        this.comments.forEach(comment => {
+            let filePath = "assets/thread/" + this.dir + "/" + this.dir + "img_" + comment.id + ".png";
+            webshot(
+                'http://localhost:3000/visuals?key=' + comment.id,
+                filePath,
+                this.options,
+                function (err) {
+                    //traitement errur
+                });
+            fs.existsSync(filePath) ? logger.info("Succesfuly created " + filePath) : logger.error("Could not create " + filePath);
+        });
+        // webshot('http://localhost:3000/visuals?key=0', "assets/thread/" + this.dir + "/" + this.dir + "img_number.png" , this.options, function(err) {
+        //     console.log(err);
+        // });
     }
-
-    stopExpressServer () {
-        // need to kill server
-    }
-
-    takeScreenshot () {
-        let options = {
-            screenSize: { width: 1920, height: 1080 },
-            shotSize: { width: "all", height: "all" },
-            errorIfJSException: "true",
-        };
-
-        webshot('google.com', 'google.png', options, function(err) {});
-    }
-
 }
-
-test = new CommentVisualsCreation();
-test.startExpressServer();
-
-// test.takeScreenshot();
 
 module.exports = CommentVisualsCreation;
 
