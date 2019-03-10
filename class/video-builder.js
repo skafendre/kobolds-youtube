@@ -24,11 +24,11 @@ class VideoBuilder {
         this.createFolder(this.id);
 
         // Cloud Text-to-Speech
-        this.cloudTTS.comments = this.reddit.redditContent.comments.map(comment => comment.body);
+        this.cloudTTS.comments = this.reddit.redditContent[0].comments.map(comment => comment.body);
         await this.cloudTTS.synthetizeComments();
 
         // Visuals creation
-        let selectedComments = this.reddit.redditContent.comments.splice(0, this.cloudTTS.comments.length);
+        let selectedComments = this.reddit.redditContent[0].comments.splice(0, this.cloudTTS.comments.length);
         logger.info("Size of comment array passed to Visuals Creation: " + selectedComments.length);
         this.commentVisuals.comments = selectedComments;
 

@@ -20,6 +20,7 @@ class CloudTTS {
     }
 
     async synthetizeComments () {
+        logger.info("Starting audio synthesis of comments in CloudTTS synthetizeComments().");
         let i = 0;
         for (let comment of this.comments) {
             await this.synthetize(comment, i);
@@ -30,7 +31,7 @@ class CloudTTS {
         }
 
         this.comments = this.comments.slice(0, i);
-        logger.info(this.comments.length + " comments left after TTS audio conversion " + ", " + gConfig.audio.targetLength + " seconds reached.");
+        logger.verbose(this.comments.length + " comments left after TTS audio conversion " + ", " + gConfig.audio.targetLength + " seconds reached.");
     }
 
     async synthetize (content, key) {

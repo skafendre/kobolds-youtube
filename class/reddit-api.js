@@ -6,7 +6,7 @@ const logger = require('./../scripts/logger');
 const redditSettings = require("../config/reddit-settings");
 
 class RedditThreadFetcher {
-    constructor(settings) {
+    constructor() {
         // Build snoowrap client
         this.r = new snoowrap({
             userAgent: 'Link with the Youtube channel content',
@@ -16,26 +16,50 @@ class RedditThreadFetcher {
             password: process.env.REDDIT_PASS
         });
 
-        this.redditContent = {};
+        this.threads = "";
+        this.redditContent = [];
     }
 
     // set settings configured in config/reddit-settings.json
     setSettings(settings) {
         this.settings = redditSettings[settings];
-        logger.verbose("Settings used => " + JSON.stringify(this.settings));
+        logger.verbose("Settings profile '" + this.settings.subreddit + "'");
+    }
+
+    async fetchPotentialThread () {
+        this.settings ? logger.verbose("Using settings => " + JSON.stringify(this.settings)) : logger.error("No settings found in reddit-api");
+
+        // Fetch threads and filters them
+        let threads = await this.r.getSubreddit(this.settings.subreddit).getTop({time: "week", limit: 100});
+        let tFiltered = threads.filter(thread =>
+            thread.is_self === true &&
+            thread.pinned === false &&
+            thread.over_18 === false &&
+            thread.stickied === false &&
+            thread.is_meta === false &&
+            thread.quarantine === false &&
+            thread.subreddit_type === "public" &&
+            thread.spoiler === false &&
+            thread.score > this.settings.minUp &&
+            thread.num_comments > this.settings.minComments
+        );
+
+        this.threads = tFiltered;
+        logger.verbose("threads length => " + threads.length + " && threads filtered => " + tFiltered.length);
     }
 
     async buildContent() {
-        let sub = await this.r.getSubreddit(this.settings.subreddit).getTop({time: "day", limit: 1});
-        await this.extractDataFromSubmission(sub);
+        await this.fetchPotentialThread();
+
+        await this.extractDataFromSubmission(this.threads[0]);
     };
 
-    async extractDataFromSubmission(submission) {
-        this.redditContent.title = submission.map(s => s.title)[0];
-        this.redditContent.id = submission.map(s => s.id)[0];
+    async extractDataFromSubmission(thread) {
+        // this.redditContent.title = thread.title;
+        // this.redditContent.id = thread.id;
 
         // GET COMMENTS DATA
-        let comments = await this.r.getSubmission(this.redditContent.id).comments.map(post => ({
+        let comments = await this.r.getSubmission(thread.id).comments.map(post => ({
             id: post.id,
             body: this.cleanComment(post.body),
             original_body: post.body,
@@ -49,17 +73,23 @@ class RedditThreadFetcher {
             depth: post.depth,
         }));
 
-
-        // remove useless stuff
-        this.redditContent.comments = comments.filter(comment => comment.author !== "[deleted]" && comment.body !== "[removed]");
-        this.redditContent.maxChar = this.redditContent.comments.reduce((acc, comment) => acc + comment.body.length, 0);
+        // push thread info
+        let threadToPush = {
+            "id": thread.id,
+            "title": thread.title,
+            "author": thread.author.name,
+            "comments": comments.filter(comment => comment.author !== "[deleted]" && comment.body !== "[removed]"),
+            "char": comments.reduce((acc, comment) => acc + comment.body.length, 0),
+        };
+        
+        this.redditContent.push(threadToPush);
 
         // trying to log some stuff for winston
         logger.log("verbose", "Reddit thread info => ", {
-            title: this.redditContent.title,
-            id: this.redditContent.id,
-            maxChar: this.redditContent.maxChar,
-            commentsNb: this.redditContent.comments.length,
+            title: threadToPush.title,
+            id: threadToPush.id,
+            char: threadToPush.char,
+            comments: threadToPush.length,
         })
     };
 

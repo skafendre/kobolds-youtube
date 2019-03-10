@@ -4,13 +4,26 @@
     "multiThreads": false,
     "replies": true,
     "maxRepliesDepth": 1,
-    "commentsPerThread": 1000
+    "maxCommentsPerThread": false,
+    "minUp": 2250,
+    "minComments": 500
   },
   "askscience": {
     "subreddit": "AskScience",
     "multiThreads": true,
     "replies": false,
     "maxRepliesDepth": 0,
-    "commentsPerThread": 1
+    "maxCommentsPerThread": 2,
+    "minUp": 1500,
+    "minComments": 50
+  },
+  "til": {
+    "subreddit": "TIL",
+    "multiThreads": true,
+    "replies": false,
+    "maxRepliesDepth": 0,
+    "maxCommentsPerThread": 3,
+    "minUp": 1250,
+    "minComments": 50
   }
 }
