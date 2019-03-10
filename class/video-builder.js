@@ -10,7 +10,7 @@ const CommentVisualCreator = require("./comment-visuals-creation");
 
 class VideoBuilder {
     constructor () {
-        this.reddit = new RedditThreadFetcher("AskScience");
+        this.reddit = new RedditThreadFetcher("Jokes");
         this.cloudTTS = new CloudTTS();
         this.commentVisuals = new CommentVisualCreator();
     }

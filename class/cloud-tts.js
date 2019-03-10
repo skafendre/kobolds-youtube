@@ -34,8 +34,6 @@ class CloudTTS {
     }
 
     async synthetize (content, key) {
-        // console.log(gConfig.audio.target_length);
-
         let fileOutput = "assets/thread/" + this.dir + "/" + this.dir + "_audio_" + key + ".mp3";
 
         if (fs.existsSync(fileOutput)) {

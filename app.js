@@ -2,7 +2,7 @@ const videoBuilder = require("./class/video-builder");
 const logger = require("./scripts/logger");
 require("./config/config");
 
-logger.info(global.gConfig);
+console.log(global.gConfig);
 
 //APP LAUNCH
 logger.info("app launched");

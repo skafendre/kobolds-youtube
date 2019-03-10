@@ -2,13 +2,16 @@ const webshot = require('webshot');
 const logger = require("./../scripts/logger");
 const fs = require("fs");
 const path = require("path");
+const util = require('util');
 
 class CommentVisualsCreation {
     constructor () {
         this.options = {
             screenSize: { width: 1920, height: 1080 },
             shotSize: { width: 1920, height: 1080 },
-            errorIfJSException: "true",
+            errorIfJSException: true,
+            quality: 150,
+            errorIfStatusIsNot200: true
         };
         this.dir = "";
         this.comments = "";
@@ -28,28 +31,49 @@ class CommentVisualsCreation {
         // PATH TO THE VISUALS CREATOR JSON COMMENTS FILES
         let jsonPath = path.resolve(__dirname, "..", "..", "simple-visuals-creator", "comments.json");
         logger.debug("Path to comments.json (visuals creation): " + jsonPath);
-        await fs.writeFile(jsonPath, json, (err) => {
-            if (err) {
-                logger.error(err);
-            } else {
-                logger.info("JSON successfully written to file");
-            }
-        });
 
-        this.comments.forEach(comment => {
+        // write file and wait for promise
+        const writeFile = util.promisify(fs.writeFile);
+        await writeFile(jsonPath, json);
+        logger.info("Succesfully written comment.json in " + jsonPath);
+        
+        // promisify webshot
+        const webshotPromise = async (html, screenPath, options) =>
+            new Promise((resolve, reject) => {
+                webshot(
+                    html,
+                    screenPath,
+                    options,
+                    e => (!e ? resolve(screenPath) : reject(e))
+                );
+            });
+
+        // for (let comment of this.comments) {
+        //     await webshotPromise(
+        //         'http://localhost:3000/visuals?key=' + comment.id,
+        //         "assets/thread/" + this.dir + "/" + this.dir + "img_" + comment.id + ".png",
+        //         this.options,
+        //     );
+        //     logger.info("Launched webshot promises for " + comment.id);
+        // }
+
+        // alt webshot
+        await this.comments.forEach(comment => {
             let filePath = "assets/thread/" + this.dir + "/" + this.dir + "img_" + comment.id + ".png";
             webshot(
                 'http://localhost:3000/visuals?key=' + comment.id,
                 filePath,
                 this.options,
                 function (err) {
-                    //traitement errur
                 });
+            logger.info("Webshot capture started for: " + comment.id);
+        });
+
+
+        await this.comments.forEach(comment => {
+            let filePath = "assets/thread/" + this.dir + "/" + this.dir + "img_" + comment.id + ".png";
             fs.existsSync(filePath) ? logger.info("Succesfuly created " + filePath) : logger.error("Could not create " + filePath);
         });
-        // webshot('http://localhost:3000/visuals?key=0', "assets/thread/" + this.dir + "/" + this.dir + "img_number.png" , this.options, function(err) {
-        //     console.log(err);
-        // });
     }
 }
 
