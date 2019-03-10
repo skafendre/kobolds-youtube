@@ -30,13 +30,13 @@ class CommentVisualsCreation {
 
         // PATH TO THE VISUALS CREATOR JSON COMMENTS FILES
         let jsonPath = path.resolve(__dirname, "..", "..", "simple-visuals-creator", "comments.json");
-        logger.debug("Path to comments.json (visuals creation): " + jsonPath);
+        logger.verbose("Path to comments.json (visuals creation): " + jsonPath);
 
         // write file and wait for promise
         const writeFile = util.promisify(fs.writeFile);
         await writeFile(jsonPath, json);
-        logger.info("Succesfully written comment.json in " + jsonPath);
-        
+        logger.info("Successfully written comment.json in " + jsonPath);
+
         // promisify webshot
         const webshotPromise = async (html, screenPath, options) =>
             new Promise((resolve, reject) => {
@@ -68,7 +68,6 @@ class CommentVisualsCreation {
                 });
             logger.info("Webshot capture started for: " + comment.id);
         });
-
 
         await this.comments.forEach(comment => {
             let filePath = "assets/thread/" + this.dir + "/" + this.dir + "img_" + comment.id + ".png";

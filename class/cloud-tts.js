@@ -65,7 +65,7 @@ class CloudTTS {
 
     async incrementAudioLength (fileOutput) {
         this.audioLength += await gad.getAudioDurationInSeconds(fileOutput);
-        logger.info("Total comment audio length: " + this.audioLength);
+        logger.verbose("Total comment audio length: " + this.audioLength);
     }
 }
 

@@ -3,9 +3,11 @@ require('dotenv').config();
 const removeMd = require('remove-markdown');
 const snoowrap = require('snoowrap');
 const logger = require('./../scripts/logger');
+const redditSettings = require("../config/reddit-settings");
 
 class RedditThreadFetcher {
-    constructor(subreddit) {
+    constructor(settings) {
+        // Build snoowrap client
         this.r = new snoowrap({
             userAgent: 'Link with the Youtube channel content',
             clientId: process.env.CLIENT_ID,
@@ -13,8 +15,14 @@ class RedditThreadFetcher {
             username: process.env.REDDIT_USER,
             password: process.env.REDDIT_PASS
         });
-        this.settings = {subreddit: subreddit};
-        this.videoContent = {};
+
+        this.redditContent = {};
+    }
+
+    // set settings configured in config/reddit-settings.json
+    setSettings(settings) {
+        this.settings = redditSettings[settings];
+        logger.verbose("Settings used => " + JSON.stringify(this.settings));
     }
 
     async buildContent() {
@@ -23,11 +31,11 @@ class RedditThreadFetcher {
     };
 
     async extractDataFromSubmission(submission) {
-        this.videoContent.title = submission.map(s => s.title)[0];
-        this.videoContent.id = submission.map(s => s.id)[0];
+        this.redditContent.title = submission.map(s => s.title)[0];
+        this.redditContent.id = submission.map(s => s.id)[0];
 
         // GET COMMENTS DATA
-        let comments = await this.r.getSubmission(this.videoContent.id).comments.map(post => ({
+        let comments = await this.r.getSubmission(this.redditContent.id).comments.map(post => ({
             id: post.id,
             body: this.cleanComment(post.body),
             original_body: post.body,
@@ -43,15 +51,15 @@ class RedditThreadFetcher {
 
 
         // remove useless stuff
-        this.videoContent.comments = comments.filter(comment => comment.author !== "[deleted]" && comment.body !== "[removed]");
-        this.videoContent.maxChar = this.videoContent.comments.reduce((acc, comment) => acc + comment.body.length, 0);
+        this.redditContent.comments = comments.filter(comment => comment.author !== "[deleted]" && comment.body !== "[removed]");
+        this.redditContent.maxChar = this.redditContent.comments.reduce((acc, comment) => acc + comment.body.length, 0);
 
         // trying to log some stuff for winston
-        logger.log("info", "Reddit thread info: ", {
-            title: this.videoContent.title,
-            id: this.videoContent.id,
-            maxChar: this.videoContent.maxChar,
-            commentsNb: this.videoContent.comments.length,
+        logger.log("verbose", "Reddit thread info => ", {
+            title: this.redditContent.title,
+            id: this.redditContent.id,
+            maxChar: this.redditContent.maxChar,
+            commentsNb: this.redditContent.comments.length,
         })
     };
 

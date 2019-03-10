@@ -10,24 +10,25 @@ const CommentVisualCreator = require("./comment-visuals-creation");
 
 class VideoBuilder {
     constructor () {
-        this.reddit = new RedditThreadFetcher("Jokes");
+        this.reddit = new RedditThreadFetcher();
         this.cloudTTS = new CloudTTS();
         this.commentVisuals = new CommentVisualCreator();
     }
 
     async buildVideo() {
         // reddit
+        this.reddit.setSettings("askreddit");
         await this.reddit.buildContent();
-        this.id = this.reddit.settings.subreddit.toLowerCase() + "_" + this.reddit.videoContent.id;
+        this.id = this.reddit.settings.subreddit.toLowerCase() + "_" + this.reddit.redditContent.id;
 
         this.createFolder(this.id);
 
         // Cloud Text-to-Speech
-        this.cloudTTS.comments = this.reddit.videoContent.comments.map(comment => comment.body);
+        this.cloudTTS.comments = this.reddit.redditContent.comments.map(comment => comment.body);
         await this.cloudTTS.synthetizeComments();
 
         // Visuals creation
-        let selectedComments = this.reddit.videoContent.comments.splice(0, this.cloudTTS.comments.length);
+        let selectedComments = this.reddit.redditContent.comments.splice(0, this.cloudTTS.comments.length);
         logger.info("Size of comment array passed to Visuals Creation: " + selectedComments.length);
         this.commentVisuals.comments = selectedComments;
 

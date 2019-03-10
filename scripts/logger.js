@@ -5,12 +5,12 @@ const logger = winston.createLogger({
         new winston.transports.Console({
             format: winston.format.combine(
                 winston.format.colorize(),
-                winston.format.simple()
+                winston.format.simple(),
             ),
-            level: process.env.WINSTON_LEVEL_CONSOLE,
+            level: "debug",
             handleExceptions: true,
             json: false,
-            colorize: true
+            colorize: true,
         })
     ]
 });
