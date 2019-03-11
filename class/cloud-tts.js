@@ -11,42 +11,43 @@ const ttsRequests = require("../config/tts-requests");
 class CloudTTS {
     constructor () {
         this.ttsClient = new textToSpeech.TextToSpeechClient({
-            projectId: 'reddit-youtube-video-creator',
+            projectId: 'reddit-youtube-videos-creator',
             keyFilename: 'gcloud_auth.json'
         });
-        this.comments = [];
-        this.dir = "";
+        this.thread = "";
         this.audioLength = 0;
     }
 
     async synthetizeComments () {
         logger.info("Starting audio synthesis of comments in CloudTTS synthetizeComments().");
+
         let i = 0;
-        for (let comment of this.comments) {
-            await this.synthetize(comment, i);
+        for (let comment of this.thread.comments) {
+            await this.synthetize(comment.body, comment.id);
             i++;
             if (this.audioLength > gConfig.audio.targetLength) {
                 break;
             }
         }
 
-        this.comments = this.comments.slice(0, i);
-        logger.verbose(this.comments.length + " comments left after TTS audio conversion " + ", " + gConfig.audio.targetLength + " seconds reached.");
+        gVideo.threads[gVideo.threads.length - 1].comments = gVideo.threads[gVideo.threads.length - 1].comments.slice(0, i);
+        logger.verbose(gVideo.threads[gVideo.threads.length - 1].comments.length + " comments left after TTS audio conversion " + ", " + gConfig.audio.targetLength + " seconds reached.");
     }
 
-    async synthetize (content, key) {
-        let fileOutput = "assets/thread/" + this.dir + "/" + this.dir + "_audio_" + key + ".mp3";
+    async synthetize (text, id) {
+        let audioName = this.thread.id + "_" + id + ".mp3";
+        let fileOutput = gAssetsPath + this.thread.id + "/" + audioName;
 
         if (fs.existsSync(fileOutput)) {
             await this.incrementAudioLength(fileOutput);
-            logger.warn(fileOutput + " already exists, cancelled synthetize() in cloud-tts.js");
+            logger.warn("Audio file already exist => " + fileOutput);
             return;
         }
 
         // Performs the Text-to-Speech request
         const request = {
-            input: {text: content},
-            voice: {languageCode: 'en-US', ssmlGender: 'NEUTRAL'},
+            input: {text: text},
+            voice: {languageCode: 'en-US', ssmlGender: 'FEMALE'},
             audioConfig: {audioEncoding: 'MP3'},
         };
         const [response] = await this.ttsClient.synthesizeSpeech(request);
@@ -58,7 +59,7 @@ class CloudTTS {
         // Check if the file has been written
         if (fs.existsSync(fileOutput)) {
             await this.incrementAudioLength(fileOutput);
-            logger.info(fileOutput + " written");
+            logger.info("Written audio file => " + fileOutput);
         } else {
             logger.error(fileOutput + " has not been written");
         }

@@ -13,41 +13,35 @@ class VideoBuilder {
         this.reddit = new RedditThreadFetcher();
         this.cloudTTS = new CloudTTS();
         this.commentVisuals = new CommentVisualCreator();
+
+        // gVideo regroup all the data for the video
+        global.gVideo = {
+            "id": "need db implementation",
+            "threads" : [],
+        };
     }
 
     async buildVideo() {
         // reddit
         this.reddit.setSettings("askreddit");
         await this.reddit.buildContent();
-        this.id = this.reddit.settings.subreddit.toLowerCase() + "_" + this.reddit.redditContent.id;
 
-        this.createFolder(this.id);
+        // videos id && folder creation (need improvements.....)
+        let videoId = this.reddit.settings.subreddit.toLowerCase() + "_" + gVideo.threads[gVideo.threads.length - 1].id;
+        global.gAssetsPath = "assets/videos/" + videoId + "/";
+
+        // create folder for assets
+        !fs.existsSync(gAssetsPath) && fs.mkdirSync(gAssetsPath);
+        let folderPath = gAssetsPath + this.reddit.threads[0].id;
+        !fs.existsSync(folderPath) && fs.mkdirSync(folderPath);
+        fs.existsSync(folderPath) ? logger.info("Created folder => " + folderPath) : logger.error("Could not create folder " + folderPath);
 
         // Cloud Text-to-Speech
-        this.cloudTTS.comments = this.reddit.redditContent[0].comments.map(comment => comment.body);
+        this.cloudTTS.thread = gVideo.threads[gVideo.threads.length - 1];
         await this.cloudTTS.synthetizeComments();
 
         // Visuals creation
-        let selectedComments = this.reddit.redditContent[0].comments.splice(0, this.cloudTTS.comments.length);
-        logger.info("Size of comment array passed to Visuals Creation: " + selectedComments.length);
-        this.commentVisuals.comments = selectedComments;
-
         await this.commentVisuals.createVisuals();
-    }
-
-    createFolder (id) {
-        let path = "assets/thread/";
-        !fs.existsSync(path + id) && fs.mkdirSync(path + id);
-
-        // check if the folder has been properly created
-        if (fs.existsSync(path + id)) {
-            logger.info("Directory '" + id + "' created in " + path);
-            this.cloudTTS.dir = id;
-            this.commentVisuals.dir = id;
-        } else {
-            logger.error("Directory '" + id + "' has not been created");
-            throw new Error('fatal error creation folder uncompleted');
-        }
     }
 }
 

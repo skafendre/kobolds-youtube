@@ -13,8 +13,6 @@ class CommentVisualsCreation {
             quality: 150,
             errorIfStatusIsNot200: true
         };
-        this.dir = "";
-        this.comments = "";
     }
 
     async createVisuals () {
@@ -32,34 +30,14 @@ class CommentVisualsCreation {
         let jsonPath = path.resolve(__dirname, "..", "..", "simple-visuals-creator", "comments.json");
         logger.verbose("Path to comments.json (visuals creation): " + jsonPath);
 
-        // write file and wait for promise
+        // write json file and wait for promise
         const writeFile = util.promisify(fs.writeFile);
         await writeFile(jsonPath, json);
         logger.info("Successfully written comment.json in " + jsonPath);
 
-        // promisify webshot
-        const webshotPromise = async (html, screenPath, options) =>
-            new Promise((resolve, reject) => {
-                webshot(
-                    html,
-                    screenPath,
-                    options,
-                    e => (!e ? resolve(screenPath) : reject(e))
-                );
-            });
-
-        // for (let comment of this.comments) {
-        //     await webshotPromise(
-        //         'http://localhost:3000/visuals?key=' + comment.id,
-        //         "assets/thread/" + this.dir + "/" + this.dir + "img_" + comment.id + ".png",
-        //         this.options,
-        //     );
-        //     logger.info("Launched webshot promises for " + comment.id);
-        // }
-
-        // alt webshot
+        // screencap comments
         await this.comments.forEach(comment => {
-            let filePath = "assets/thread/" + this.dir + "/" + this.dir + "img_" + comment.id + ".png";
+            let fileName =  + comment.id + ".png";
             webshot(
                 'http://localhost:3000/visuals?key=' + comment.id,
                 filePath,
@@ -70,7 +48,7 @@ class CommentVisualsCreation {
         });
 
         await this.comments.forEach(comment => {
-            let filePath = "assets/thread/" + this.dir + "/" + this.dir + "img_" + comment.id + ".png";
+            let filePath = "assets/videos/" + this.dir + "/" + this.dir + "img_" + comment.id + ".png";
             fs.existsSync(filePath) ? logger.info("Succesfuly created " + filePath) : logger.error("Could not create " + filePath);
         });
     }

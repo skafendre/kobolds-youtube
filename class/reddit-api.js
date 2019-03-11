@@ -17,7 +17,6 @@ class RedditThreadFetcher {
         });
 
         this.threads = "";
-        this.redditContent = [];
     }
 
     // set settings configured in config/reddit-settings.json
@@ -55,9 +54,6 @@ class RedditThreadFetcher {
     };
 
     async extractDataFromSubmission(thread) {
-        // this.redditContent.title = thread.title;
-        // this.redditContent.id = thread.id;
-
         // GET COMMENTS DATA
         let comments = await this.r.getSubmission(thread.id).comments.map(post => ({
             id: post.id,
@@ -73,7 +69,7 @@ class RedditThreadFetcher {
             depth: post.depth,
         }));
 
-        // push thread info
+        // push videos info
         let threadToPush = {
             "id": thread.id,
             "title": thread.title,
@@ -82,10 +78,10 @@ class RedditThreadFetcher {
             "char": comments.reduce((acc, comment) => acc + comment.body.length, 0),
         };
         
-        this.redditContent.push(threadToPush);
+        gVideo.threads.push(threadToPush);
 
-        // trying to log some stuff for winston
-        logger.log("verbose", "Reddit thread info => ", {
+        // winston lloogogo
+        logger.log("verbose", "Reddit videos info => ", {
             title: threadToPush.title,
             id: threadToPush.id,
             char: threadToPush.char,
@@ -93,6 +89,7 @@ class RedditThreadFetcher {
         })
     };
 
+    // remove url, special char? (not sure), markdown
     cleanComment (comment) {
         return removeMd(comment.replace(/\n/g, '')).replace(/(?:https?|ftp):\/\/[\n\S]+/g, '');
     }
