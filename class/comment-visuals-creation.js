@@ -16,17 +16,35 @@ class CommentVisualsCreation {
     }
 
     async createVisuals () {
-        logger.info("Started createVisuals() inside CommentVisualsCreation");
+        logger.info("Started Visuals creation");
 
-        const arrayToObject = (array) =>
-            array.reduce((obj, item) => {
-                obj[item.id] = item;
-                return obj
-            }, {});
+        await this.linkWithExpressRendering();
 
-        let json = JSON.stringify(arrayToObject(this.comments));
+        // screencap comments
+        await gVideo.threads[gI].comments.forEach(comment => {
+            let fileName = gVideo.threads[gI].id + "_" + comment.id + ".png";
+            console.log(gAssetsPath + gVideo.threads[gI].id + fileName);
+            webshot(
+                'google.com' ,
+                gAssetsPath + gVideo.threads[gI].id + "/" + fileName,
+                this.options,
+                function (err) {
+                    if (err) {
+                        logger.error("Webshot Error.");
+                    }
+                });
+        });
 
-        // PATH TO THE VISUALS CREATOR JSON COMMENTS FILES
+        await gVideo.threads[gI].comments.forEach(comment => {
+            let fileName = comment.id + ".png";
+            fs.existsSync(gAssetsPath + fileName) ? logger.info("Succesfuly created " + fileName) : logger.error("Could not create " + fileName);
+        });
+    }
+
+    // might now work
+    async linkWithExpressRendering () {
+        // Link with express rendering
+        let json = JSON.stringify(gVideo.threads[gI]); // not working for now
         let jsonPath = path.resolve(__dirname, "..", "..", "simple-visuals-creator", "comments.json");
         logger.verbose("Path to comments.json (visuals creation): " + jsonPath);
 
@@ -34,23 +52,6 @@ class CommentVisualsCreation {
         const writeFile = util.promisify(fs.writeFile);
         await writeFile(jsonPath, json);
         logger.info("Successfully written comment.json in " + jsonPath);
-
-        // screencap comments
-        await this.comments.forEach(comment => {
-            let fileName =  + comment.id + ".png";
-            webshot(
-                'http://localhost:3000/visuals?key=' + comment.id,
-                filePath,
-                this.options,
-                function (err) {
-                });
-            logger.info("Webshot capture started for: " + comment.id);
-        });
-
-        await this.comments.forEach(comment => {
-            let filePath = "assets/videos/" + this.dir + "/" + this.dir + "img_" + comment.id + ".png";
-            fs.existsSync(filePath) ? logger.info("Succesfuly created " + filePath) : logger.error("Could not create " + filePath);
-        });
     }
 }
 

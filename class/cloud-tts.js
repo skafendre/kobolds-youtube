@@ -21,6 +21,8 @@ class CloudTTS {
     async synthetizeComments () {
         logger.info("Starting audio synthesis of comments in CloudTTS synthetizeComments().");
 
+        await this.synthetize(gVideo.threads[gI].title, "title");
+
         let i = 0;
         for (let comment of this.thread.comments) {
             await this.synthetize(comment.body, comment.id);
@@ -30,17 +32,18 @@ class CloudTTS {
             }
         }
 
-        gVideo.threads[gVideo.threads.length - 1].comments = gVideo.threads[gVideo.threads.length - 1].comments.slice(0, i);
-        logger.verbose(gVideo.threads[gVideo.threads.length - 1].comments.length + " comments left after TTS audio conversion " + ", " + gConfig.audio.targetLength + " seconds reached.");
+        gVideo.threads[gI].comments = gVideo.threads[gI].comments.slice(0, i);
+        logger.info("Reached target audio length of => " + gConfig.audio.targetLength + " sec.");
+        logger.verbose(gVideo.threads[gI].comments.length + " comments left after TTS audio conversion");
     }
 
-    async synthetize (text, id) {
-        let audioName = this.thread.id + "_" + id + ".mp3";
+    async synthetize (text, fileName) {
+        let audioName = this.thread.id + "_" + fileName + ".mp3";
         let fileOutput = gAssetsPath + this.thread.id + "/" + audioName;
 
         if (fs.existsSync(fileOutput)) {
-            await this.incrementAudioLength(fileOutput);
             logger.warn("Audio file already exist => " + fileOutput);
+            await this.incrementAudioLength(fileOutput);
             return;
         }
 
@@ -58,8 +61,8 @@ class CloudTTS {
 
         // Check if the file has been written
         if (fs.existsSync(fileOutput)) {
-            await this.incrementAudioLength(fileOutput);
             logger.info("Written audio file => " + fileOutput);
+            await this.incrementAudioLength(fileOutput);
         } else {
             logger.error(fileOutput + " has not been written");
         }

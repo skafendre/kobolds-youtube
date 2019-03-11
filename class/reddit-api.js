@@ -3,7 +3,7 @@ require('dotenv').config();
 const removeMd = require('remove-markdown');
 const snoowrap = require('snoowrap');
 const logger = require('./../scripts/logger');
-const redditSettings = require("../config/reddit-settings");
+const redditProfiles = require("../config/reddit-profiles");
 
 class RedditThreadFetcher {
     constructor() {
@@ -16,13 +16,10 @@ class RedditThreadFetcher {
             password: process.env.REDDIT_PASS
         });
 
-        this.threads = "";
-    }
-
-    // set settings configured in config/reddit-settings.json
-    setSettings(settings) {
-        this.settings = redditSettings[settings];
+        this.settings = redditProfiles[gConfig.profile];
         logger.verbose("Settings profile '" + this.settings.subreddit + "'");
+
+        this.threads = "";
     }
 
     async fetchPotentialThread () {
@@ -49,7 +46,6 @@ class RedditThreadFetcher {
 
     async buildContent() {
         await this.fetchPotentialThread();
-
         await this.extractDataFromSubmission(this.threads[0]);
     };
 

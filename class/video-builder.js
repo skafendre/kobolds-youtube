@@ -23,7 +23,6 @@ class VideoBuilder {
 
     async buildVideo() {
         // reddit
-        this.reddit.setSettings("askreddit");
         await this.reddit.buildContent();
 
         // videos id && folder creation (need improvements.....)
