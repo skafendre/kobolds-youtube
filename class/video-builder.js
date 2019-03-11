@@ -26,7 +26,7 @@ class VideoBuilder {
         await this.reddit.buildContent();
 
         // videos id && folder creation (need improvements.....)
-        let videoId = this.reddit.settings.subreddit.toLowerCase() + "_" + gVideo.threads[gVideo.threads.length - 1].id;
+        let videoId = gConfig.redditProfile.subreddit.toLowerCase() + "_" + gVideo.threads[gVideo.threads.length - 1].id;
         global.gAssetsPath = "assets/videos/" + videoId + "/";
 
         // create folder for assets
@@ -36,7 +36,7 @@ class VideoBuilder {
         fs.existsSync(folderPath) ? logger.info("Created folder => " + folderPath) : logger.error("Could not create folder " + folderPath);
 
         // Cloud Text-to-Speech
-        this.cloudTTS.thread = gVideo.threads[gVideo.threads.length - 1];
+        this.cloudTTS.thread = gVideo.threads[gI];
         await this.cloudTTS.synthetizeComments();
 
         // Visuals creation

@@ -9,8 +9,9 @@ const logger = winston.createLogger({
             ),
             level: "debug",
             handleExceptions: true,
-            json: false,
+            json: true,
             colorize: true,
+            prettyPrint: true,
         })
     ]
 });

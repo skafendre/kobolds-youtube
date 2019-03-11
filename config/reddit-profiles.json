@@ -4,7 +4,7 @@
     "multiThreads": false,
     "replies": true,
     "maxRepliesDepth": 1,
-    "maxCommentsPerThread": false,
+    "commentsPerThread": 1000,
     "minUp": 2250,
     "minComments": 500
   },
@@ -13,7 +13,7 @@
     "multiThreads": true,
     "replies": false,
     "maxRepliesDepth": 0,
-    "maxCommentsPerThread": 2,
+    "commentsPerThread": 2,
     "minUp": 1500,
     "minComments": 50
   },
@@ -22,7 +22,7 @@
     "multiThreads": true,
     "replies": false,
     "maxRepliesDepth": 0,
-    "maxCommentsPerThread": 3,
+    "commentsPerThread": 3,
     "minUp": 1250,
     "minComments": 50
   }

@@ -3,7 +3,6 @@ require('dotenv').config();
 const removeMd = require('remove-markdown');
 const snoowrap = require('snoowrap');
 const logger = require('./../scripts/logger');
-const redditProfiles = require("../config/reddit-profiles");
 
 class RedditThreadFetcher {
     constructor() {
@@ -16,17 +15,16 @@ class RedditThreadFetcher {
             password: process.env.REDDIT_PASS
         });
 
-        this.settings = redditProfiles[gConfig.profile];
-        logger.verbose("Settings profile '" + this.settings.subreddit + "'");
+        logger.verbose("Settings profile '" + gConfig.redditProfile.subreddit + "'");
 
         this.threads = "";
     }
 
     async fetchPotentialThread () {
-        this.settings ? logger.verbose("Using settings => " + JSON.stringify(this.settings)) : logger.error("No settings found in reddit-api");
+        gConfig.redditProfile ? logger.verbose("Using settings => " + JSON.stringify(gConfig.redditProfile)) : logger.error("No settings found in reddit-api");
 
         // Fetch threads and filters them
-        let threads = await this.r.getSubreddit(this.settings.subreddit).getTop({time: "week", limit: 100});
+        let threads = await this.r.getSubreddit(gConfig.redditProfile.subreddit).getTop({time: "week", limit: 100});
         let tFiltered = threads.filter(thread =>
             thread.is_self === true &&
             thread.pinned === false &&
@@ -36,8 +34,8 @@ class RedditThreadFetcher {
             thread.quarantine === false &&
             thread.subreddit_type === "public" &&
             thread.spoiler === false &&
-            thread.score > this.settings.minUp &&
-            thread.num_comments > this.settings.minComments
+            thread.score > gConfig.redditProfile.minUp &&
+            thread.num_comments > gConfig.redditProfile.minComments
         );
 
         this.threads = tFiltered;
@@ -77,7 +75,7 @@ class RedditThreadFetcher {
         gVideo.threads.push(threadToPush);
 
         // winston lloogogo
-        logger.log("verbose", "Reddit videos info => ", {
+        logger.log("verbose", "Reddit videos info => \n", {
             title: threadToPush.title,
             id: threadToPush.id,
             char: threadToPush.char,

@@ -34,24 +34,18 @@ class CommentVisualsCreation {
                     }
                 });
         });
-
-        await gVideo.threads[gI].comments.forEach(comment => {
-            let fileName = comment.id + ".png";
-            fs.existsSync(gAssetsPath + fileName) ? logger.info("Succesfuly created " + fileName) : logger.error("Could not create " + fileName);
-        });
     }
 
     // might now work
     async linkWithExpressRendering () {
-        // Link with express rendering
         let json = JSON.stringify(gVideo.threads[gI]); // not working for now
-        let jsonPath = path.resolve(__dirname, "..", "..", "simple-visuals-creator", "comments.json");
+        let jsonPath = path.resolve(__dirname, "..", "..", "simple-visuals-creator", "thread.json");
         logger.verbose("Path to comments.json (visuals creation): " + jsonPath);
 
         // write json file and wait for promise
         const writeFile = util.promisify(fs.writeFile);
         await writeFile(jsonPath, json);
-        logger.info("Successfully written comment.json in " + jsonPath);
+        logger.info("Successfully written in thread.json in " + jsonPath);
     }
 }
 

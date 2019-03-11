@@ -27,13 +27,14 @@ class CloudTTS {
         for (let comment of this.thread.comments) {
             await this.synthetize(comment.body, comment.id);
             i++;
-            if (this.audioLength > gConfig.audio.targetLength) {
+            if (this.audioLength > gConfig.audio.targetLength || i >= gConfig.redditProfile.commentsPerThread) {
                 break;
             }
         }
 
         gVideo.threads[gI].comments = gVideo.threads[gI].comments.slice(0, i);
-        logger.info("Reached target audio length of => " + gConfig.audio.targetLength + " sec.");
+        logger.info("Reached audio length of => " + this.audioLength + ". Target audio length was => " + gConfig.audio.targetLength );
+        logger.info("Reached comments nb => " + i + ". Max comments /thread was => " + gConfig.redditProfile.commentsPerThread);
         logger.verbose(gVideo.threads[gI].comments.length + " comments left after TTS audio conversion");
     }
 

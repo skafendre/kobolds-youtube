@@ -1,8 +1,9 @@
 const videoBuilder = require("./class/video-builder");
 const logger = require("./scripts/logger");
+const redditProfiles = require("./config/reddit-profiles");
 require("./config/config");
 
-gConfig.profile = "askreddit";
+gConfig.redditProfile = redditProfiles["askreddit"];
 global.gI = 0;
 
 //APP LAUNCH
