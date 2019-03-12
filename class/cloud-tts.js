@@ -32,6 +32,7 @@ class CloudTTS {
             }
         }
 
+        // slice unused comments + logging
         gVideo.threads[gI].comments = gVideo.threads[gI].comments.slice(0, i);
         logger.info("Reached audio length of => " + this.audioLength + ". Target audio length was => " + gConfig.audio.targetLength );
         logger.info("Reached comments nb => " + i + ". Max comments /thread was => " + gConfig.redditProfile.commentsPerThread);
@@ -43,8 +44,7 @@ class CloudTTS {
         let fileOutput = gAssetsPath + this.thread.id + "/" + audioName;
 
         if (fs.existsSync(fileOutput)) {
-            logger.warn("Audio file already exist => " + fileOutput);
-            await this.incrementAudioLength(fileOutput);
+            await this.checkFile("warn", fileOutput);
             return;
         }
 
@@ -62,11 +62,15 @@ class CloudTTS {
 
         // Check if the file has been written
         if (fs.existsSync(fileOutput)) {
-            logger.info("Written audio file => " + fileOutput);
-            await this.incrementAudioLength(fileOutput);
+            await this.checkFile("info", fileOutput);
         } else {
             logger.error(fileOutput + " has not been written");
         }
+    }
+
+    async checkFile (level, fileOutput) {
+        level === "info" ? logger.info("Written audio file => " + fileOutput) : logger.warn("Audio file already exist => " + fileOutput);
+        await this.incrementAudioLength(fileOutput);
     }
 
     async incrementAudioLength (fileOutput) {

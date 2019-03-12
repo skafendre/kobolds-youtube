@@ -1,7 +1,7 @@
 {
     "development" : {
         "audio": {
-            "targetLength" : "50"
+            "targetLength" : "75"
         }
     },
     "production" : {

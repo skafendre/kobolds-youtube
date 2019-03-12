@@ -20,12 +20,25 @@ class CommentVisualsCreation {
 
         await this.linkWithExpressRendering();
 
+        // screencap thread title
+        webshot(
+            'http://localhost:3000/thread' ,
+            gAssetsPath + gVideo.threads[gI].id + "/" + gVideo.threads[gI].id + "_title.png",
+            this.options,
+            function (err) {
+                if (err) {
+                    logger.error("Webshot Error.");
+                }
+            }
+        );
+
         // screencap comments
+        let i = 0;
         await gVideo.threads[gI].comments.forEach(comment => {
             let fileName = gVideo.threads[gI].id + "_" + comment.id + ".png";
             console.log(gAssetsPath + gVideo.threads[gI].id + fileName);
             webshot(
-                'google.com' ,
+                'http://localhost:3000/comment?id=' + i,
                 gAssetsPath + gVideo.threads[gI].id + "/" + fileName,
                 this.options,
                 function (err) {
