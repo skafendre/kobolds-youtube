@@ -1,12 +1,16 @@
 {
-    "development" : {
-        "audio": {
-            "targetLength" : "75"
-        }
+  "development": {
+    "audio": {
+      "targetLength": "45"
     },
-    "production" : {
-        "audio": {
-            "targetLength" : "430"
-        }
+    "path": {
+      "video": "./../python-video-editing/video.json",
+      "visuals": "./../simple-visuals-creator/thread.json"
     }
+  },
+  "production": {
+    "audio": {
+      "targetLength": "430"
+    }
+  }
 }

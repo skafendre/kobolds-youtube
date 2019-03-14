@@ -1,6 +1,8 @@
 "use strict";
 const fs = require("fs");
 const logger = require("./../scripts/logger");
+const util = require("util");
+const path = require("path");
 
 // CLASSES
 const RedditThreadFetcher = require("./reddit-api");
@@ -25,7 +27,7 @@ class VideoBuilder {
         // reddit
         await this.reddit.buildContent();
 
-        // videos id && folder creation (need improvements.....)
+        // videos id
         let videoId = gConfig.redditProfile.subreddit.toLowerCase() + "_" + gVideo.threads[gVideo.threads.length - 1].id;
         global.gAssetsPath = "assets/videos/" + videoId + "/";
 
@@ -41,6 +43,28 @@ class VideoBuilder {
 
         // Visuals creation
         await this.commentVisuals.createVisuals();
+
+        this.linkWithVideoEditing();
+    }
+
+    async linkWithVideoEditing () {
+        // simplify threads and passed it to video-editing.
+        let simplifiedThreads = gVideo.threads.map(thread => ({
+            name: thread.id,
+            id: thread.id + "_title",
+            dir: path.resolve(__dirname, "..", gAssetsPath, gVideo.threads[gI].id),
+            comments: thread.comments.map(comment => ({
+                id: thread.id + "_" + comment.id,
+            }))
+        }));
+
+        let json = JSON.stringify(simplifiedThreads);
+
+        // write json file and wait for promise
+        const writeFile = util.promisify(fs.writeFile);
+        await writeFile(gConfig.path.video, json, function(err){
+            err ? console.log(err) : logger.info("Successfully written in video.json in " + gConfig.path.video);
+        });
     }
 }
 
