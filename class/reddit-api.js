@@ -24,7 +24,7 @@ class RedditThreadFetcher {
         gConfig.redditProfile ? logger.verbose("Using settings => " + JSON.stringify(gConfig.redditProfile)) : logger.error("No settings found in reddit-api");
 
         // Fetch threads and filters them
-        let threads = await this.r.getSubreddit(gConfig.redditProfile.subreddit).getTop({time: "week", limit: 100});
+        let threads = await this.r.getSubreddit(gConfig.redditProfile.subreddit).getTop({time: "daily", limit: 100});
         let tFiltered = threads.filter(thread =>
             thread.is_self === true &&
             thread.pinned === false &&
