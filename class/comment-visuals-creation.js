@@ -1,14 +1,13 @@
 const webshot = require('webshot');
 const logger = require("./../scripts/logger");
 const fs = require("fs");
-const path = require("path");
 const util = require('util');
 
 class CommentVisualsCreation {
     constructor () {
         this.options = {
-            screenSize: { width: 1920, height: 1080 },
-            shotSize: { width: 1920, height: 1080 },
+            screenSize: {width: 1920, height: 1080},
+            shotSize: {width: 1920, height: 1080},
             errorIfJSException: true,
             quality: 150,
             errorIfStatusIsNot200: true
@@ -20,35 +19,41 @@ class CommentVisualsCreation {
 
         await this.linkWithExpressRendering();
 
-        // screencap thread title
-        webshot(
+        await this.takeWebshots()
+    }
+
+    async takeWebshots () {
+        // promisify webshot
+        const webshotPromise = async (html, screenPath, options) =>
+            new Promise((resolve, reject) => {
+                webshot(html, screenPath, options, e => (!e ? resolve(screenPath) : reject(e))
+                );
+            });
+
+        let promises = [];
+
+        // title
+        promises.push(webshotPromise(
             'http://localhost:3000/thread' ,
             gAssetsPath + gVideo.threads[gI].id + "/" + gVideo.threads[gI].id + "_title.png",
             this.options,
-            function (err) {
-                if (err) {
-                    logger.error("Webshot Error.");
-                }
-            }
-        );
+        ));
 
-        // screencap comments
+        // comments
         let i = 0;
         await gVideo.threads[gI].comments.forEach(comment => {
-            let fileName = gVideo.threads[gI].id + "_" + comment.id + ".png";
-            webshot(
+            promises.push(webshotPromise(
                 'http://localhost:3000/comment?id=' + i,
-                gAssetsPath + gVideo.threads[gI].id + "/" + fileName,
+                gAssetsPath + gVideo.threads[gI].id + "/" + gVideo.threads[gI].id + "_" + comment.id + ".png",
                 this.options,
-                function (err) {
-                    if (err) {
-                        logger.error("Webshot Error.");
-                        process.exit(1);
-                    } else {
-                        logger.info("Successfully created => " + gAssetsPath + gVideo.threads[gI].id + fileName);
-                    }
-                });
-            i++;
+            ));
+            i++
+        });
+
+        await Promise.all(promises).then((responses) => {
+            promises.length !== responses.length ?
+                logger.info("Took " + responses.length + "/" + promises.length + " webshots.") :
+                logger.info("Took " + responses.length + "/" + promises.length + " webshots.") ;
         });
     }
 

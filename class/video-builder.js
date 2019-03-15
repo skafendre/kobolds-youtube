@@ -8,19 +8,15 @@ const path = require("path");
 const RedditThreadFetcher = require("./reddit-api");
 const CloudTTS = require("./cloud-tts");
 const CommentVisualCreator = require("./comment-visuals-creation");
-
+const VideoEditing = require("./video-editing");
 
 class VideoBuilder {
     constructor () {
         this.reddit = new RedditThreadFetcher();
         this.cloudTTS = new CloudTTS();
         this.commentVisuals = new CommentVisualCreator();
+        this.videoEditing = new VideoEditing();
 
-        // gVideo regroup all the data for the video
-        global.gVideo = {
-            "id": "need db implementation",
-            "threads" : [],
-        };
     }
 
     async buildVideo() {
@@ -44,7 +40,9 @@ class VideoBuilder {
         // Visuals creation
         await this.commentVisuals.createVisuals();
 
+        // Video editing
         this.linkWithVideoEditing();
+        this.videoEditing.compileVideo();
     }
 
     async linkWithVideoEditing () {
