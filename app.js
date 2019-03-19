@@ -4,7 +4,7 @@ const redditProfiles = require("./config/reddit-profiles");
 require("./config/config");
 
 // initialize globals
-gConfig.redditProfile = redditProfiles["askreddit"];
+gConfig.redditProfile = redditProfiles["askscience"];
 global.gI = 0; // global increment for multi rthreads
 global.gVideo = {
     "id": "need db implementation",

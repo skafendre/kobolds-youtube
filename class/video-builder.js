@@ -37,6 +37,8 @@ class VideoBuilder {
         this.cloudTTS.thread = gVideo.threads[gI];
         await this.cloudTTS.synthetizeComments();
 
+        // process.exit(); // Focusing on audio
+        //
         // Visuals creation
         await this.commentVisuals.createVisuals();
 
@@ -50,7 +52,7 @@ class VideoBuilder {
         let simplifiedThreads = gVideo.threads.map(thread => ({
             name: thread.id,
             id: thread.id + "_title",
-            music: "earth",
+            music: gConfig.redditProfile.music,
             dir: path.resolve(__dirname, "..", gAssetsPath, gVideo.threads[gI].id),
             comments: thread.comments.map(comment => ({
                 id: thread.id + "_" + comment.id,

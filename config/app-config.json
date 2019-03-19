@@ -1,7 +1,7 @@
 {
   "development": {
     "audio": {
-      "targetLength": "45"
+      "targetLength": "50"
     },
     "path": {
       "video": "./../python-video-editing/video.json",

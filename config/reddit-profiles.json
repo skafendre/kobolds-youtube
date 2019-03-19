@@ -6,7 +6,9 @@
     "maxRepliesDepth": 1,
     "commentsPerThread": 1000,
     "minUp": 2250,
-    "minComments": 500
+    "minComments": 500,
+    "voice": "en-US-Wavenet-A",
+    "music": "earth"
   },
   "askscience": {
     "subreddit": "AskScience",
@@ -14,8 +16,10 @@
     "replies": false,
     "maxRepliesDepth": 0,
     "commentsPerThread": 2,
-    "minUp": 1500,
-    "minComments": 50
+    "minUp": 1000,
+    "minComments": 50,
+    "voice": "en-GB-Wavenet-B",
+    "music": "space"
   },
   "til": {
     "subreddit": "TIL",
@@ -23,7 +27,9 @@
     "replies": false,
     "maxRepliesDepth": 0,
     "commentsPerThread": 3,
-    "minUp": 1250,
-    "minComments": 50
+    "minUp": 1000,
+    "minComments": 50,
+    "voice": "en-US-Wavenet-E",
+    "music": "earth"
   }
 }

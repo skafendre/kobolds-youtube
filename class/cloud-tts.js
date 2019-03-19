@@ -25,7 +25,9 @@ class CloudTTS {
 
         let i = 0;
         for (let comment of this.thread.comments) {
-            await this.synthetize(comment.body, comment.id);
+            let cleanCom = comment.body.replace(/\n\n/g, '. ').replace(/&#x200B;/g, ""); // need cleaning
+            console.log(cleanCom);
+            await this.synthetize(cleanCom, comment.id);
             i++;
             if (this.audioLength > gConfig.audio.targetLength || i >= gConfig.redditProfile.commentsPerThread) {
                 break;
@@ -51,8 +53,8 @@ class CloudTTS {
         // Performs the Text-to-Speech request
         const request = {
             input: {text: text},
-            voice: {languageCode: 'en-US', ssmlGender: 'FEMALE'},
-            audioConfig: {audioEncoding: 'MP3'},
+            voice: {languageCode: 'en-US', name: gConfig.redditProfile.voice},
+            audioConfig: {audioEncoding: 'LINEAR16'},
         };
         const [response] = await this.ttsClient.synthesizeSpeech(request);
 

@@ -38,7 +38,7 @@ class RedditThreadFetcher {
             thread.num_comments > gConfig.redditProfile.minComments
         );
 
-        this.threads = tFiltered;
+        this.threads = tFiltered; // threads that passed all the filters
         logger.verbose("threads length => " + threads.length + " && threads filtered => " + tFiltered.length);
     }
 
@@ -52,7 +52,7 @@ class RedditThreadFetcher {
         let comments = await this.r.getSubmission(thread.id).comments.map(post => ({
             id: post.id,
             body: this.cleanComment(post.body),
-            original_body: post.body,
+            htmlBody: post.body_html,
             author: post.author.name,
             edited: post.edited,
             is_submitter: post.is_submitter,
@@ -74,7 +74,7 @@ class RedditThreadFetcher {
         
         gVideo.threads.push(threadToPush);
 
-        // winston lloogogo
+        // some logging
         logger.log("verbose", "Reddit videos info => \n", {
             title: threadToPush.title,
             id: threadToPush.id,
@@ -85,7 +85,8 @@ class RedditThreadFetcher {
 
     // remove url, special char? (not sure), markdown
     cleanComment (comment) {
-        return removeMd(comment.replace(/\n/g, '')).replace(/(?:https?|ftp):\/\/[\n\S]+/g, '');
+        comment = removeMd(comment);
+        return comment.replace(/(?:https?|ftp):\/\/[\n\S]+/g, '');
     }
 }
 

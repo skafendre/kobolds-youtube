@@ -26,8 +26,7 @@ class CommentVisualsCreation {
         // promisify webshot
         const webshotPromise = async (html, screenPath, options) =>
             new Promise((resolve, reject) => {
-                webshot(html, screenPath, options, e => (!e ? resolve(screenPath) : reject(e))
-                );
+                webshot(html, screenPath, options, e => (!e ? resolve(screenPath) : reject(e)));
             });
 
         let promises = [];
@@ -43,7 +42,7 @@ class CommentVisualsCreation {
         let i = 0;
         await gVideo.threads[gI].comments.forEach(comment => {
             promises.push(webshotPromise(
-                'http://localhost:3000/comment?id=' + i,
+                'http://localhost:3000/comment?id=' + comment.id,
                 gAssetsPath + gVideo.threads[gI].id + "/" + gVideo.threads[gI].id + "_" + comment.id + ".png",
                 this.options,
             ));
@@ -52,7 +51,7 @@ class CommentVisualsCreation {
 
         await Promise.all(promises).then((responses) => {
             promises.length !== responses.length ?
-                logger.info("Took " + responses.length + "/" + promises.length + " webshots.") :
+                logger.error("Took " + responses.length + "/" + promises.length + " webshots.") :
                 logger.info("Took " + responses.length + "/" + promises.length + " webshots.") ;
         });
     }
