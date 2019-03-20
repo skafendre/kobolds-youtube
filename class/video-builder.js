@@ -16,7 +16,6 @@ class VideoBuilder {
         this.cloudTTS = new CloudTTS();
         this.commentVisuals = new CommentVisualCreator();
         this.videoEditing = new VideoEditing();
-
     }
 
     async buildVideo() {
@@ -37,8 +36,6 @@ class VideoBuilder {
         this.cloudTTS.thread = gVideo.threads[gI];
         await this.cloudTTS.synthetizeComments();
 
-        // process.exit(); // Focusing on audio
-        //
         // Visuals creation
         await this.commentVisuals.createVisuals();
 

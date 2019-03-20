@@ -2,6 +2,8 @@ const webshot = require('webshot');
 const logger = require("./../scripts/logger");
 const fs = require("fs");
 const util = require('util');
+const puppeteer = require("puppeteer");
+
 
 class CommentVisualsCreation {
     constructor () {
@@ -12,6 +14,11 @@ class CommentVisualsCreation {
             quality: 150,
             errorIfStatusIsNot200: true
         };
+        this.promises = [];
+    }
+
+    async startPuppeteer() {
+        this.browser = await puppeteer.launch();
     }
 
     async createVisuals () {
@@ -19,44 +26,40 @@ class CommentVisualsCreation {
 
         await this.linkWithExpressRendering();
 
-        await this.takeWebshots()
+        await this.takeScreenshots();
     }
 
-    async takeWebshots () {
-        // promisify webshot
-        const webshotPromise = async (html, screenPath, options) =>
-            new Promise((resolve, reject) => {
-                webshot(html, screenPath, options, e => (!e ? resolve(screenPath) : reject(e)));
-            });
+    async takeScreenshots () {
+        await this.startPuppeteer();
 
-        let promises = [];
-
-        // title
-        promises.push(webshotPromise(
-            'http://localhost:3000/thread' ,
-            gAssetsPath + gVideo.threads[gI].id + "/" + gVideo.threads[gI].id + "_title.png",
-            this.options,
-        ));
+        //title
+        await this.screenshot("thread", gAssetsPath + gVideo.threads[gI].id + "/" + gVideo.threads[gI].id + "_title.png");
 
         // comments
-        let i = 0;
-        await gVideo.threads[gI].comments.forEach(comment => {
-            promises.push(webshotPromise(
-                'http://localhost:3000/comment?id=' + comment.id,
-                gAssetsPath + gVideo.threads[gI].id + "/" + gVideo.threads[gI].id + "_" + comment.id + ".png",
-                this.options,
-            ));
-            i++
-        });
+        for (let comment of gVideo.threads[gI].comments) {
+            let path = gAssetsPath + gVideo.threads[gI].id + "/" + gVideo.threads[gI].id + "_" + comment.id + ".png";
+            await this.screenshot("comment?id=" + comment.id, path);
+        }
 
-        await Promise.all(promises).then((responses) => {
-            promises.length !== responses.length ?
-                logger.error("Took " + responses.length + "/" + promises.length + " webshots.") :
-                logger.info("Took " + responses.length + "/" + promises.length + " webshots.") ;
-        });
+        await Promise.all(this.promises).then((test =>
+            logger.info("Taken screenhot succefully")
+        )).catch(err =>
+            logger.error("Error screenshots => " + err)
+        );
+
+        this.browser.close();
     }
 
-    // might now work
+    async screenshot (target, path) {
+        const page = await this.browser.newPage();
+        await page.goto('http://localhost:3000/' + target);
+        await page.setViewport({width: 1920, height: 1080});
+
+        this.promises.push(page.screenshot({path: path})
+            .then(await console.log("Written file to => " + path))
+        );
+    }
+
     async linkWithExpressRendering () {
         let json = JSON.stringify(gVideo.threads[gI]);
 

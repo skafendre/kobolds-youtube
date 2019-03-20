@@ -1,4 +1,15 @@
 {
+  "dev": {
+    "subreddit": "AskReddit",
+    "multiThreads": false,
+    "replies": true,
+    "maxRepliesDepth": 1,
+    "commentsPerThread": 1000,
+    "minUp": 1000,
+    "minComments": 50,
+    "voice": "en-US-Standard-D",
+    "music": "earth"
+  },
   "askreddit": {
     "subreddit": "AskReddit",
     "multiThreads": false,

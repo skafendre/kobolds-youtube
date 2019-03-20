@@ -35,7 +35,8 @@ class RedditThreadFetcher {
             thread.subreddit_type === "public" &&
             thread.spoiler === false &&
             thread.score > gConfig.redditProfile.minUp &&
-            thread.num_comments > gConfig.redditProfile.minComments
+            thread.num_comments > gConfig.redditProfile.minComments &&
+            thread.distinguished === null
         );
 
         this.threads = tFiltered; // threads that passed all the filters
@@ -61,6 +62,7 @@ class RedditThreadFetcher {
             gildings: post.gildings,
             stickied: post.stickied,
             depth: post.depth,
+            distinguished: post.distinguished
         }));
 
         // push videos info
@@ -68,10 +70,14 @@ class RedditThreadFetcher {
             "id": thread.id,
             "title": thread.title,
             "author": thread.author.name,
-            "comments": comments.filter(comment => comment.author !== "[deleted]" && comment.body !== "[removed]"),
+            "subreddit": thread.subreddit_name_prefixed,
+            "gildings": thread.gildings,
+            "created": thread.created_utc,
+            "num_comments": thread.num_comments,
+            "comments": comments.filter(comment => comment.author !== "[deleted]" && comment.body !== "[removed]" && comment.distinguished === null),
             "char": comments.reduce((acc, comment) => acc + comment.body.length, 0),
         };
-        
+
         gVideo.threads.push(threadToPush);
 
         // some logging
