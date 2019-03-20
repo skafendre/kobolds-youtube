@@ -1,6 +1,6 @@
 {
   "dev": {
-    "subreddit": "AskReddit",
+    "subreddit": "AskScience",
     "multiThreads": false,
     "replies": true,
     "maxRepliesDepth": 1,

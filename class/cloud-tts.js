@@ -14,11 +14,11 @@ class CloudTTS {
         this.audioLength = 0;
     }
 
-    async synthetizeComments () {
+    async synthetizeThread () {
         logger.info("Starting audio synthesis of comments in CloudTTS synthetizeComments()");
 
         // Title
-        await this.synthetize(gVideo.threads[gI].title, "title");
+        await this.synthetizeTitle(gVideo.threads[gI].title);
 
         // Comments
         let i = 0;
@@ -27,7 +27,7 @@ class CloudTTS {
 
             (cleanCom.length >= 2500) ?
                 await this.synthetizeLong(cleanCom, comment.id) :
-                await this.synthetize(cleanCom, comment.id);
+                await this.synthetizeComment(cleanCom, comment.id);
 
             i++;
             if (this.audioLength > gConfig.audio.targetLength || i >= gConfig.redditProfile.commentsPerThread) {
@@ -40,6 +40,11 @@ class CloudTTS {
         logger.info("Reached audio length of => " + this.audioLength + ". Target audio length was => " + gConfig.audio.targetLength );
         logger.info("Reached comments nb => " + i + ". Max comments /thread was => " + gConfig.redditProfile.commentsPerThread);
         logger.verbose(gVideo.threads[gI].comments.length + " comments left after TTS audio conversion");
+    }
+
+    async synthetizeTitle (text) {
+        let fileOutput = gAssetsPath + gVideo.threads[gI].id + "/" + gVideo.threads[gI].id + "_title.mp3";
+        await this.synthetize(text, fileOutput);
     }
 
     async synthetizeLong (text, id) {
@@ -60,56 +65,56 @@ class CloudTTS {
                 lastCut = i;
             }
         }
-
+        // push leftovers
         commentsParts.push(sentences.slice(lastCut, sentences.length).reduce((acc, val) => acc + "." +  val).trim());
-
-        console.log(commentsParts);
-
 
         let index = 0;
         for (let part of commentsParts) {
             logger.verbose("Comment " + id + " part " + index + " => " + part.length + " characters");
-            await this.synthetize(part, id + "_part" + index + "_" + part.length);
+            await this.synthetize(part, id + "_part" + index + "_" + part.length, );
             index++;
         }
     }
 
-    async synthetize (text, fileName) {
-        let audioName = gVideo.threads[gI].id + "_" + fileName + ".mp3";
+     setFileName (id, audioName) {
+        if (gVideo.threads[gI].comments.find(comment => comment.id === id).audio === undefined) {
+            gVideo.threads[gI].comments.find(comment => comment.id === id).audio = [];
+        }
+
+        gVideo.threads[gI].comments.find(comment => comment.id === id).audio.push(audioName);
+        console.log(gVideo.threads[gI].comments.find(comment => comment.id === id));
+    }
+
+    async synthetizeComment (text, id) {
+        let audioName = gVideo.threads[gI].id + "_" + id + ".mp3";
         let fileOutput = gAssetsPath + gVideo.threads[gI].id + "/" + audioName;
 
-        if (fs.existsSync(fileOutput)) {
-            await this.checkFile("warn", fileOutput);
-            return;
-        }
-
-        // Performs the Text-to-Speech request
-        const request = {
-            input: {text: text},
-            voice: {languageCode: 'en-US', name: gConfig.redditProfile.voice},
-            audioConfig: {audioEncoding: 'LINEAR16'},
-        };
-        const [response] = await this.ttsClient.synthesizeSpeech(request).catch(err => {
-            logger.error("Error Cloud TTS API => " + err.details);
-            process.exit(10);
-        });
-
-        // Write file localy
-        const writeFile = util.promisify(fs.writeFile);
-        await writeFile(fileOutput, response.audioContent, 'binary');
-
-        // Check if the file has been written
-        if (fs.existsSync(fileOutput)) {
-            await this.checkFile("info", fileOutput);
-        } else {
-            logger.error(fileOutput + " has not been written");
-        }
+        await this.synthetize(text, fileOutput);
+        this.setFileName(id, audioName);
     }
 
-    async checkFile (level, fileOutput) {
-        level === "info" ? logger.info("Written audio file => " + fileOutput) : logger.warn("Audio file already exist => " + fileOutput);
-        await this.incrementAudioLength(fileOutput);
+    async synthetize (text, filePath) {
+        if (!fs.existsSync(filePath)) {
+            // Performs the Text-to-Speech request
+            const request = {
+                input: {text: text},
+                voice: {languageCode: 'en-US', name: gConfig.redditProfile.voice},
+                audioConfig: {audioEncoding: 'LINEAR16'},
+            };
+            const [response] = await this.ttsClient.synthesizeSpeech(request).catch(err => {
+                logger.error("Error Cloud TTS API => " + err.details);
+                process.exit(10);
+            });
+
+            // Write file locally
+            const writeFile = util.promisify(fs.writeFile);
+            await writeFile(filePath, response.audioContent, 'binary');
+        }
+
+        await this.incrementAudioLength(filePath);
+        (fs.existsSync(filePath)) ? logger.info("Written audio file => " + filePath) : logger.error("ERROR AUDIO FILE NOT WRITTEN");
     }
+
 
     async incrementAudioLength (fileOutput) {
         this.audioLength += await gad.getAudioDurationInSeconds(fileOutput);

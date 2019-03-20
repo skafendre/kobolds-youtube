@@ -34,10 +34,12 @@ class VideoBuilder {
 
         // Cloud Text-to-Speech
         this.cloudTTS.thread = gVideo.threads[gI];
-        await this.cloudTTS.synthetizeComments();
+        await this.cloudTTS.synthetizeThread();
 
         // Visuals creation
         await this.commentVisuals.createVisuals();
+
+        process.exit(1);
 
         // Video editing
         await this.linkWithVideoEditing();
@@ -55,6 +57,8 @@ class VideoBuilder {
                 id: thread.id + "_" + comment.id,
             }))
         }));
+
+        console.log(gVideo.threads[gI].comments);
 
         let json = JSON.stringify(simplifiedThreads);
 
