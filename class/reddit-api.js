@@ -70,6 +70,7 @@ class RedditThreadFetcher {
             "id": thread.id,
             "title": thread.title,
             "author": thread.author.name,
+            "score": thread.score,
             "subreddit": thread.subreddit_name_prefixed,
             "gildings": thread.gildings,
             "created": thread.created_utc,

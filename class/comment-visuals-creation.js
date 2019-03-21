@@ -1,4 +1,3 @@
-const webshot = require('webshot');
 const logger = require("./../scripts/logger");
 const fs = require("fs");
 const util = require('util');

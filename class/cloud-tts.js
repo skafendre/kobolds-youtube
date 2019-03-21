@@ -17,7 +17,6 @@ class CloudTTS {
     async synthetizeThread () {
         logger.info("Starting audio synthesis of comments in CloudTTS synthetizeComments()");
 
-        // Title
         await this.synthetizeTitle(gVideo.threads[gI].title);
 
         // Comments
@@ -43,8 +42,13 @@ class CloudTTS {
     }
 
     async synthetizeTitle (text) {
-        let fileOutput = gAssetsPath + gVideo.threads[gI].id + "/" + gVideo.threads[gI].id + "_title.mp3";
+        let audioName = gVideo.threads[gI].id + "_title.mp3";
+        let fileOutput = gAssetsPath + gVideo.threads[gI].id + "/" + audioName;
         await this.synthetize(text, fileOutput);
+
+        gVideo.threads[gI].titleAssets = {
+            audio: audioName
+        };
     }
 
     async synthetizeLong (text, id) {
@@ -52,7 +56,6 @@ class CloudTTS {
 
         let sentences = text.split(".").filter(sentence => sentence !== "");
         let commentsParts = [];
-        console.log(sentences);
 
         let acc = 0;
         let lastCut = 0;
@@ -70,8 +73,13 @@ class CloudTTS {
 
         let index = 0;
         for (let part of commentsParts) {
+            let audioName = gVideo.threads[gI].id + "_" + id + "_part_" + index + ".mp3";
+            let fileOutput = gAssetsPath + gVideo.threads[gI].id + "/" + audioName;
+
+            await this.synthetize(part, fileOutput);
+            this.setFileName(id, audioName);
+
             logger.verbose("Comment " + id + " part " + index + " => " + part.length + " characters");
-            await this.synthetize(part, id + "_part" + index + "_" + part.length, );
             index++;
         }
     }
@@ -82,7 +90,6 @@ class CloudTTS {
         }
 
         gVideo.threads[gI].comments.find(comment => comment.id === id).audio.push(audioName);
-        console.log(gVideo.threads[gI].comments.find(comment => comment.id === id));
     }
 
     async synthetizeComment (text, id) {

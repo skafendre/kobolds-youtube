@@ -39,8 +39,6 @@ class VideoBuilder {
         // Visuals creation
         await this.commentVisuals.createVisuals();
 
-        process.exit(1);
-
         // Video editing
         await this.linkWithVideoEditing();
         this.videoEditing.compileVideo();
@@ -49,16 +47,20 @@ class VideoBuilder {
     async linkWithVideoEditing () {
         // simplify threads and passed it to video-editing.
         let simplifiedThreads = gVideo.threads.map(thread => ({
-            name: thread.id,
-            id: thread.id + "_title",
+            id: thread.id,
+            title_assets: {
+              img: thread.id + "_title.png",
+              audio: thread.titleAssets.audio,
+            },
             music: gConfig.redditProfile.music,
             dir: path.resolve(__dirname, "..", gAssetsPath, gVideo.threads[gI].id),
             comments: thread.comments.map(comment => ({
                 id: thread.id + "_" + comment.id,
+                audio: comment.audio,
             }))
         }));
 
-        console.log(gVideo.threads[gI].comments);
+        console.log(simplifiedThreads);
 
         let json = JSON.stringify(simplifiedThreads);
 
