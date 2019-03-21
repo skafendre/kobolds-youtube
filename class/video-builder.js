@@ -50,13 +50,13 @@ class VideoBuilder {
             id: thread.id,
             title_assets: {
               img: thread.id + "_title.png",
-              audio: thread.titleAssets.audio,
+              audio: [thread.titleAssets.audio],
             },
             music: gConfig.redditProfile.music,
             dir: path.resolve(__dirname, "..", gAssetsPath, gVideo.threads[gI].id),
             comments: thread.comments.map(comment => ({
                 id: thread.id + "_" + comment.id,
-                audio: comment.audio,
+                assets: comment.assets,
             }))
         }));
 

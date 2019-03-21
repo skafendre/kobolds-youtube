@@ -85,11 +85,8 @@ class CloudTTS {
     }
 
      setFileName (id, audioName) {
-        if (gVideo.threads[gI].comments.find(comment => comment.id === id).audio === undefined) {
-            gVideo.threads[gI].comments.find(comment => comment.id === id).audio = [];
-        }
-
-        gVideo.threads[gI].comments.find(comment => comment.id === id).audio.push(audioName);
+        gVideo.threads[gI].comments.find(comment => comment.id === id).assets.audio.push(audioName);
+        logger.debug("Pushed audio file name => " + audioName + " on comment => " + id);
     }
 
     async synthetizeComment (text, id) {
@@ -101,6 +98,7 @@ class CloudTTS {
     }
 
     async synthetize (text, filePath) {
+        logger.debug("Text synthetize => \n\n" + text + "\n\n");
         if (!fs.existsSync(filePath)) {
             // Performs the Text-to-Speech request
             const request = {

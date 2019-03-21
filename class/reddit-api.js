@@ -62,7 +62,12 @@ class RedditThreadFetcher {
             gildings: post.gildings,
             stickied: post.stickied,
             depth: post.depth,
-            distinguished: post.distinguished
+            distinguished: post.distinguished,
+            created: post.created,
+            assets: {
+                audio: [],
+                img: ""
+            }
         }));
 
         // push videos info
@@ -75,6 +80,7 @@ class RedditThreadFetcher {
             "gildings": thread.gildings,
             "created": thread.created_utc,
             "num_comments": thread.num_comments,
+            "color": gConfig.redditProfile.color,
             "comments": comments.filter(comment => comment.author !== "[deleted]" && comment.body !== "[removed]" && comment.distinguished === null),
             "char": comments.reduce((acc, comment) => acc + comment.body.length, 0),
         };

@@ -8,7 +8,8 @@
     "minUp": 1000,
     "minComments": 50,
     "voice": "en-US-Standard-D",
-    "music": "earth"
+    "music": "earth",
+    "color": "blue"
   },
   "askreddit": {
     "subreddit": "AskReddit",

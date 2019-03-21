@@ -3,7 +3,6 @@ const fs = require("fs");
 const util = require('util');
 const puppeteer = require("puppeteer");
 
-
 class CommentVisualsCreation {
     constructor () {
         this.options = {
@@ -36,8 +35,12 @@ class CommentVisualsCreation {
 
         // comments
         for (let comment of gVideo.threads[gI].comments) {
-            let path = gAssetsPath + gVideo.threads[gI].id + "/" + gVideo.threads[gI].id + "_" + comment.id + ".png";
+            let fileName = gVideo.threads[gI].id + "_" + comment.id + ".png";
+            let path = gAssetsPath + gVideo.threads[gI].id + "/" + fileName;
             await this.screenshot("comment?id=" + comment.id, path);
+
+            // stock img file name in gVideo thread comments
+            gVideo.threads[gI].comments.find(c => c.id === comment.id).assets.img = fileName;
         }
 
         await Promise.all(this.promises).then((test =>
